@@ -23,10 +23,11 @@ def insert_emp():
     try:
         cursor.execute("INSERT INTO emp(empno, ename) VALUES (:1, :2)", [empno, ename.upper()])
         conn.commit()
-        print("Data inserted successfully")
+        print("Welcome")
     except oracledb.DatabaseError as e:
         print(f"Error inserting data: {e}")
-def delete_emp():    
+def delete_emp():  
+    print('이름을 입력하시오')  
     ename = input()
     try:
         cursor.execute("DELETE FROM emp WHERE ename = :1", [ename.upper()])
@@ -58,9 +59,10 @@ while loop:
         print('3. 직원조회를 선택하셨습니다.')
         select_emp()
     elif choice == 4:
-        print('기타')
+        print('프로그램을 종료합니다.')
         loop = False
-
+    else:
+        print('잘못된 입력입니다.')
 
 
 
