@@ -36,27 +36,47 @@ def insert_emp():
         print("입력 오류입니다. 사번+이름을 입력해주세요")
 
 def update_emp():
-    empno = input("수정할 직원의 사번을 입력하시오: ").strip()
-    cursor.execute(f"SELECT * FROM emp WHERE ename = :1", [empno])
+    empno = input("수정할 직원의 사원번호를를 입력하시오: ").strip()
+    
+
+    if not empno.isdigit():
+        print('숫자를 입력해주세요')
+    cursor.execute(
+        "SELECT empno, ename, job, mgr, sal, deptno FROM emp WHERE empno = :1",
+        [empno]
+    )
+    empno = int(empno)
+    row = cursor.fetchone()
+
+    if row is None:
+        print("존재하지 않는 사원번호입니다.")
+        return
+
     number = input('수정할 정보를 선택해주십시오.\n1. 직책  2. 사수  3. 연봉  4. 부서번호\n번호 입력: ').strip()
-    if empno.isdigit():
-        if number == "1":
+    for row in employee:
+        p = Person(row[0])
+        if number is not p:
+            print('존재하지 않는 사원번호입니다.')
+    try:
+        if number == 1:
             input('새 직책: ').strip()
             cursor.execute("UPDATE emp SET job where empno :1", [empno])
             conn.commit()
-        elif number == "2":
+        elif number == 2:
             input('새 사수의 번호: ').strip()
             cursor.execute("UPDATE emp SET mgr where empno :1", [empno])
             conn.commit()
-        elif number == "3":
+        elif number == 3:
             input('새 연봉: ').strip()
             cursor.execute("UPDATE emp SET sal where empno :1", [empno])
             conn.commit()
-        elif number == "4":
+        elif number == 4:
             input('새 부서번호: ').strip()
             cursor.execute("UPDATE emp SET job where empno :1", [empno])
             conn.commit()
-    else:
+        else:
+            print("잘못된 입력입니다.")
+    except:
         print("잘못된 입력입니다.")
 def delete_emp():
     ename = input("삭제할 이름을 입력하시오: ").strip().upper()
