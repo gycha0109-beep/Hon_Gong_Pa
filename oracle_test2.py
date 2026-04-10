@@ -7,6 +7,22 @@ conn = oracledb.connect(user="c##mbc", password="qwer1234", dsn=dsn)
 
 # 쿼리 실행을 위한 커서 생성
 cursor = conn.cursor()
+employee = []
+class Person:
+    def __init__(self, empno, ename, job, mgr, hiredate, sal, comm, deptno):
+        self.empno = empno
+        self.ename = ename
+        self.job = job
+        self.mgr = mgr
+        self.hiredate = hiredate
+        self.sal = sal
+        self.comm = comm
+        self.deptno = deptno
+    
+    def info_emp(self):
+        print(f"{self.empno}, {self.ename}, {self.job}, {self.mgr}, {self.hiredate}, {self.sal}, {self.comm}, {self.deptno}")
+
+
 
 def show_menu():
     print('-- 임직원 관리 시스템 --')
@@ -20,12 +36,15 @@ def insert_emp():
     print('사번과 이름을 입력하시오')
     empno, ename = input().split()
     print(empno, ename)
-    try:
-        cursor.execute("INSERT INTO emp(empno, ename) VALUES (:1, :2)", [empno, ename.upper()])
-        conn.commit()
-        print("Welcome")
-    except oracledb.DatabaseError as e:
-        print(f"Error inserting data: {e}")
+    if empno.isdigit():
+        try:
+            cursor.execute("INSERT INTO emp(empno, ename) VALUES (:1, :2)", [empno, ename.upper()])
+            conn.commit()
+            print("Welcome")
+        except oracledb.DatabaseError as e:
+            print(f"Error inserting data: {e}")
+    else:
+        print('CHA 0001 : 입력 오류입니다. 사번+이름을 입력해주세요')
 def delete_emp():  
     print('이름을 입력하시오')  
     ename = input()
@@ -36,18 +55,20 @@ def delete_emp():
     except oracledb.DatabaseError as e:
         print(f"Error deleting data: {e}")
 def select_emp():
-    print('이름을 입력하시오')
-    ename = input()
     try:
-        cursor.execute("SELECT * FROM emp where ename = :1", [ename.upper()])
+        cursor.execute('''
+        SELECT EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO
+        FROM emp
+        ORDER BY EMPNO''')  
         for row in cursor:
-            print(row)
+            p = Person(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+            employee.append(p)
+        for i in employee:
+            i.info_emp()
     except oracledb.DatabaseError as e:
         print(f"Error fetching data: {e}")
 
-loop = True
-
-while loop:
+while True:
     choice = int(show_menu())
     if choice == 1:
         print('1. 직원추가를 선택하셨습니다.')
@@ -60,7 +81,7 @@ while loop:
         select_emp()
     elif choice == 4:
         print('프로그램을 종료합니다.')
-        loop = False
+        break
     else:
         print('잘못된 입력입니다.')
 
